@@ -45,12 +45,19 @@ M.last = nil
 ---@type NoiceMessage[]
 M._messages = {}
 
+M._did_setup = false
+
 function M.setup()
+  if M._did_setup then
+    return
+  end
+  M._did_setup = true
+
   local hist = vim.trim(vim.api.nvim_cmd({ cmd = "messages" }, { output = true }))
   if hist == "" then
     return
   end
-  local message = M.get(M.events.history_show)
+  local message = M.get(M.events.show)
   message:set(hist)
   Manager.add(message)
 end
@@ -145,6 +152,10 @@ end
 function M.on_confirm(event, kind, content)
   if State.skip(event, kind, content) then
     return
+  end
+  local prev = Manager.get({ event = event, kind = kind }, { history = true })[1]
+  if prev then
+    Manager.remove(prev)
   end
   local message = Message(event, kind, content)
   if not message:content():find("%s+$") then

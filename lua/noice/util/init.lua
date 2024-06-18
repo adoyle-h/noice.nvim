@@ -5,6 +5,8 @@ local Config = require("noice.config")
 
 local M = {}
 
+M.islist = vim.islist or vim.tbl_islist
+
 M.stats = require("noice.util.stats")
 M.call = require("noice.util.call")
 M.nui = require("noice.util.nui")
@@ -18,6 +20,8 @@ M.ESC = M.t("<esc>")
 M.BS = M.t("<bs>")
 M.EXIT = M.t("<C-\\><C-n>")
 M.LUA_CALLBACK = "\x80\253g"
+M.RIGHT = M.t("<right>")
+M.LEFT = M.t("<left>")
 M.CMD = "\x80\253h"
 
 ---@generic F: fun()
@@ -213,6 +217,14 @@ function M._diff(a, b)
   return false
 end
 
+function M.is_search()
+  local cmdline = require("noice.ui.cmdline")
+  local c = cmdline.active
+  if c and (c.state.firstc == "/" or c.state.firstc == "?") then
+    return true
+  end
+end
+
 ---@param opts? {blocking:boolean, mode:boolean, input:boolean, redraw:boolean}
 function M.is_blocking(opts)
   opts = vim.tbl_deep_extend("force", {
@@ -319,7 +331,17 @@ function M.info(msg, ...)
   M.notify(msg, vim.log.levels.INFO, ...)
 end
 
+---@param data any
 function M.debug(data)
+  if not Config.options.debug then
+    return
+  end
+  if type(data) == "function" then
+    data = data()
+  end
+  if type(data) ~= "string" then
+    data = vim.inspect(data)
+  end
   local file = "./noice.log"
   local fd = io.open(file, "a+")
   if not fd then

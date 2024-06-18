@@ -17,7 +17,7 @@ Highly experimental plugin that completely replaces the UI for `messages`, `cmdl
 - 💻 fully customizable **cmdline** with icons
 - 💅 **syntax highlighting** for `vim` and `lua` on the **cmdline**
 - 🚥 **statusline** components
-- 🔭 open message history in [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)
+- 🔭 open message history in [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) or [fzf-lua](https://github.com/ibhagwan/fzf-lua)
 
 ## 🔥 Status
 
@@ -27,7 +27,7 @@ Check this [tracking issue](https://github.com/folke/noice.nvim/issues/6) for a 
 
 ## ⚡️ Requirements
 
-- Neovim >= 0.8.0 **_(nightly highly recommended)_**
+- Neovim >= 0.9.0 **_(nightly highly recommended)_**
 - [nui.nvim](https://github.com/MunifTanjim/nui.nvim): used for proper rendering and multiple views
 - [nvim-notify](https://github.com/rcarriga/nvim-notify): notification view _**(optional)**_
 - a [Nerd Font](https://www.nerdfonts.com/) **_(optional)_**
@@ -123,7 +123,7 @@ Check the [wiki](https://github.com/folke/noice.nvim/wiki/Configuration-Recipes)
       filter = { pattern = "^:%s*!", icon = "$", lang = "bash" },
       lua = { pattern = { "^:%s*lua%s+", "^:%s*lua%s*=%s*", "^:%s*=%s*" }, icon = "", lang = "lua" },
       help = { pattern = "^:%s*he?l?p?%s+", icon = "" },
-      input = {}, -- Used by input()
+      input = { view = "cmdline_input", icon = "󰥻 " }, -- Used by input()
       -- lua = false, -- to disable a format, set to `false`
     },
   },
@@ -191,6 +191,12 @@ Check the [wiki](https://github.com/folke/noice.nvim/wiki/Configuration-Recipes)
       opts = { enter = true, format = "details" },
       filter = { error = true },
       filter_opts = { reverse = true },
+    },
+    all = {
+      -- options for the message history that you get with `:Noice`
+      view = "split",
+      opts = { enter = true, format = "details" },
+      filter = {},
     },
   },
   notify = {
@@ -276,12 +282,6 @@ Check the [wiki](https://github.com/folke/noice.nvim/wiki/Configuration-Recipes)
   },
   health = {
     checker = true, -- Disable if you don't want health checks to run
-  },
-  smart_move = {
-    -- noice tries to move out of the way of existing floating windows.
-    enabled = true, -- you can disable this behaviour here
-    -- add any filetypes here, that shouldn't trigger smart move.
-    excluded_filetypes = { "cmp_menu", "cmp_docs", "notify" },
   },
   ---@type NoicePresets
   presets = {
@@ -524,6 +524,8 @@ Formatters are used in `format` definitions. **Noice** includes the following bu
   },
   telescope = ..., -- formatter used to display telescope results
   telescope_preview = ..., -- formatter used to preview telescope results
+  fzf = ..., -- formatter used to display fzf results
+  fzf_preview = ..., -- formatter used to preview fzf results
   lsp_progress = ..., -- formatter used by lsp progress
   lsp_progress_done = ..., -- formatter used by lsp progress
 }
@@ -634,6 +636,11 @@ require("lualine").setup({
 
 </details>
 
+## 🔭 Pickers
+
+For convenience, you can do `:Noice pick`, which will open a picker with all the messages in the history,
+either with `telescope` or `fzf-lua`.
+
 ## 🔭 Telescope
 
 In order to use **Noice** in **Telescope**, you can either do `:Noice telescope`,
@@ -643,6 +650,11 @@ The results panel is formatted using `config.format.formatters.telescope`. The p
 ```lua
 require("telescope").load_extension("noice")
 ```
+
+## 🔭 Fzf Lua
+
+In order to use **Noice** in **FzfLua**, you can do `:Noice fzf`.
+The results panel is formatted using `config.format.formatters.fzf`. The preview is formatted with `config.format.formatters.telescope_fzf`
 
 ## 🚀 Usage
 
